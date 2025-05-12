@@ -18,17 +18,17 @@ const outputImagesDir = 'static/images';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Определяем, какой файл использовать
 const hasPug = fs.existsSync('src/index.pug');
 const hasHtml = fs.existsSync('src/index.html');
 
 const srcStylus = ['src/styles/**/*.css', 'src/styles/**/*.styl'];
 const srcSass = ['src/styles/**/*.{scss,sass}'];
-const srcPug = hasPug ? ['src/*.pug'] : []; // Все .pug файлы в src/
+const srcPug = hasPug ? ['src/*.pug'] : [];
 const srcHtml = hasHtml ? ['src/*.html'] : [];
 const srcJS = ['src/scripts/**/*.js'];
 const srcSVG = ['src/assets/*.svg'];
 const srcImages = ['src/images/**/*.{svg,jpg,gif,png}'];
+const srcFonts = ['src/fonts/**/*.{woff,woff2,ttf,otf,eot}'];
 
 function server(done) {
   gulpConnect.server({
@@ -142,24 +142,43 @@ function js() {
     .pipe(gulpif(!isProduction, gulpConnect.reload()));
 }
 
+function fonts() {
+  return gulp
+    .src(srcFonts, { allowEmpty: true })
+    .pipe(plumber())
+    .pipe(gulp.dest(`${outputDir}/fonts`))
+    .pipe(gulpif(!isProduction, gulpConnect.reload()));
+}
+
 function watch() {
   gulp.watch(srcJS, gulp.series(js));
   gulp.watch(srcSVG, gulp.series(svg));
   gulp.watch(srcStylus, gulp.series(stylus));
   gulp.watch(srcSass, gulp.series(sass));
   gulp.watch(srcImages, gulp.series(images));
-  if (hasPug) gulp.watch(['src/*.pug', 'src/pugs/**/*.pug'], gulp.series(pug)); // Следим за pugs/
+  gulp.watch(srcFonts, gulp.series(fonts));
+  if (hasPug) gulp.watch(['src/*.pug', 'src/pugs/**/*.pug'], gulp.series(pug));
   if (hasHtml) gulp.watch(srcHtml, gulp.series(html));
 }
 
 exports.default = gulp.parallel(
   watch,
-  gulp.series(clean, js, svg, pug, html, stylus, sass, images, server)
+  gulp.series(clean, js, svg, pug, html, stylus, sass, images, fonts, server)
 );
 exports.server = server;
 exports.clean = clean;
-exports.build = gulp.series(clean, js, svg, pug, html, images, stylus, sass);
+exports.build = gulp.series(
+  clean,
+  js,
+  svg,
+  pug,
+  html,
+  images,
+  fonts,
+  stylus,
+  sass
+);
 exports.dev = gulp.parallel(
   watch,
-  gulp.series(clean, js, pug, html, svg, stylus, sass, images, server)
+  gulp.series(clean, js, pug, html, svg, stylus, sass, images, fonts, server)
 );

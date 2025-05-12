@@ -13,6 +13,7 @@
     "npm": ">=6"
   },
   "devDependencies": {
+    "@prettier/plugin-pug": "^3.4.0",
     "delete": "^1.1.0",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
@@ -26,8 +27,11 @@
     "gulp-stylus": "^2.7.0",
     "gulp-svg-sprite": "^1.5.0",
     "gulp-uglify": "^3.0.2",
+    "normalize.css": "^8.0.1",
+    "prettier": "^3.5.3",
     "pug": "^2.0.4",
-    "sass": "^1.88.0"
+    "sass": "^1.88.0",
+    "sass-alias": "^2.0.1"
   },
   "scripts": {
     "dev": "gulp dev",
